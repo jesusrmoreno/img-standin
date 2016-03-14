@@ -141,5 +141,9 @@ func main() {
 	r.HandleFunc("/{color}-{width}-{height}.png", imageHandler).Methods("GET")
 	n := negroni.Classic()
 	n.UseHandler(r)
-	n.Run(":" + os.Getenv("PORT"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+	n.Run(":" + port)
 }
