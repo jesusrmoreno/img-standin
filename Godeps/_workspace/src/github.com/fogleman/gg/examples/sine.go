@@ -3,7 +3,7 @@ package main
 import (
 	"math"
 
-	"github.com/fogleman/gg"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/fogleman/gg"
 )
 
 func main() {

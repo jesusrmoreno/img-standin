@@ -10,7 +10,7 @@ package basicfont
 import (
 	"image"
 
-	"golang.org/x/image/math/fixed"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/golang.org/x/image/math/fixed"
 )
 
 // Range maps a contiguous range of runes to vertically adjacent sub-images of

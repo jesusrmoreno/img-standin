@@ -18,7 +18,7 @@ package raster
 import (
 	"strconv"
 
-	"golang.org/x/image/math/fixed"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/golang.org/x/image/math/fixed"
 )
 
 // A cell is part of a linked list (for a given yi co-ordinate) of accumulated

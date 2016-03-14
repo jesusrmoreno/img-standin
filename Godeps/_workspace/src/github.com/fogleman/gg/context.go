@@ -9,9 +9,9 @@ import (
 	"io"
 	"math"
 
-	"github.com/golang/freetype/raster"
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/basicfont"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/golang/freetype/raster"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/golang.org/x/image/font"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/golang.org/x/image/font/basicfont"
 )
 
 type LineCap int
@@ -560,7 +560,7 @@ func (dc *Context) LoadFontFace(path string, points float64) error {
 	if err == nil {
 		dc.fontFace = face
 		dc.fontHeight = points * 72 / 96
-	} 
+	}
 	return err
 }
 

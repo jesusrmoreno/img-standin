@@ -1,6 +1,6 @@
 package main
 
-import "github.com/fogleman/gg"
+import "github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/fogleman/gg"
 
 func main() {
 	dc := gg.NewContext(1000, 1000)
