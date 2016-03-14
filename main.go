@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -11,6 +12,9 @@ import (
 	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/gorilla/mux"
 	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/lucasb-eyer/go-colorful"
 )
+
+const maxWidth = 10000
+const maxHeight = 10000
 
 type err interface {
 	error
@@ -92,10 +96,11 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, sErr.Error(), sErr.Status())
 		return
 	}
-	if wi > 10000 || he > 10000 {
+	if wi > maxWidth || he > maxHeight {
+		msg := fmt.Sprintf("Image too big must of size less than %dx%d", maxWidth, maxHeight)
 		sErr := statusError{
 			Code: 400,
-			Err:  errors.New("Width or Height too big. Must be no more than 50000px"),
+			Err:  errors.New(msg),
 		}
 		http.Error(w, sErr.Error(), sErr.Status())
 		return
