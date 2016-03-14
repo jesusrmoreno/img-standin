@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/codegangsta/negroni"
@@ -140,5 +141,5 @@ func main() {
 	r.HandleFunc("/{color}-{width}-{height}.png", imageHandler).Methods("GET")
 	n := negroni.Classic()
 	n.UseHandler(r)
-	n.Run(":3000")
+	n.Run(":" + os.Getenv("PORT"))
 }
