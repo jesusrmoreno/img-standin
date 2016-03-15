@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/codegangsta/negroni"
-	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/fogleman/gg"
-	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/gorilla/mux"
-	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/lucasb-eyer/go-colorful"
+	"github.com/codegangsta/negroni"
+	"github.com/fogleman/gg"
+	"github.com/gorilla/mux"
+	"github.com/lucasb-eyer/go-colorful"
 )
 
 const maxWidth = 10000
@@ -69,6 +69,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, sErr.Error(), sErr.Status())
 		return
 	}
+
 	c, err := colorful.Hex(hex)
 	if err != nil {
 		sErr := statusError{
@@ -98,7 +99,8 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if wi > maxWidth || he > maxHeight {
-		msg := fmt.Sprintf("Image too big must of size less than %dx%d", maxWidth, maxHeight)
+		msg := fmt.Sprintf("Image too big must of size less than %dx%d",
+			maxWidth, maxHeight)
 		sErr := statusError{
 			Code: 400,
 			Err:  errors.New(msg),
@@ -112,44 +114,66 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		text = strings.Replace(text, "_", " ", -1)
 	}
+
+	_, withCross := vars["x"]
 	w.Header().Set("Content-Type", "image/jpeg")
-	if err := createImage(text, wi, he, c).EncodePNG(w); err != nil {
+	if err := createImage(text, wi, he, c, withCross).EncodePNG(w); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
-
 }
 
 const fontSize = 24
 
-func createImage(text string, width, height int, background colorful.Color) *gg.Context {
-	m := gg.NewContext(width, height)
-	m.SetColor(background)
-	m.DrawRectangle(0, 0, float64(width), float64(height))
+// if the r+g+b is > (256 / 2) * 3) -> lineColor = black else lineColor = white
+
+func createImage(text string, w, h int, bg colorful.Color, cross bool) *gg.Context {
+	m := gg.NewContext(w, h)
+	m.SetColor(bg)
+	m.DrawRectangle(0, 0, float64(w), float64(h))
 	m.Fill()
-	m.SetHexColor("#000")
-	strokeSize := 3
+	red := bg.R
+	green := bg.G
+	blue := bg.B
+	if cross {
+		m.DrawLine(0, 0, float64(w), float64(h))
+		m.DrawLine(0, float64(h), float64(w), 0)
+		if red+green+blue > (.5 * 3) {
+			m.SetRGBA(0, 0, 0, .7)
+		} else {
+			m.SetRGBA(1, 1, 1, .7)
+		}
+		m.Stroke()
+	}
+	m.SetRGB(red, green, blue)
+	strokeSize := 5
 	for dy := -strokeSize; dy <= strokeSize; dy++ {
 		for dx := -strokeSize; dx <= strokeSize; dx++ {
-			// give it rounded corners
-			if dx*dx+dy*dy >= strokeSize*strokeSize {
-				continue
-			}
-			x := float64(width/2 + dx)
-			y := float64(height/2 + dy)
+			x := float64(w/2 + dx)
+			y := float64(h/2 + dy)
 			m.DrawStringAnchored(text, x, y, 0.5, 0.5)
 		}
 	}
-	m.SetHexColor("#ffffff")
-	m.DrawStringAnchored(text, float64(width)/2, float64(height/2), 0.5, 0.5)
+	if red+green+blue > (.5 * 3) {
+		m.SetRGBA(0, 0, 0, .7)
+	} else {
+		m.SetRGBA(1, 1, 1, .7)
+	}
+	m.DrawStringAnchored(text, float64(w)/2, float64(h/2), 0.5, 0.5)
 	m.Fill()
 	return m
 }
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/{text}/{color}-{width}-{height}.png", imageHandler).Methods("GET")
-	r.HandleFunc("/{color}-{width}-{height}.png", imageHandler).Methods("GET")
+	r.HandleFunc("/{text}/{color}-{width}-{height}-{x}.png", imageHandler).
+		Methods("GET")
+	r.HandleFunc("/{text}/{color}-{width}-{height}.png", imageHandler).
+		Methods("GET")
+	r.HandleFunc("/{color}-{width}-{height}-{x}.png", imageHandler).
+		Methods("GET")
+	r.HandleFunc("/{color}-{width}-{height}.png", imageHandler).
+		Methods("GET")
 	n := negroni.Classic()
 	n.UseHandler(r)
 	port := os.Getenv("PORT")
