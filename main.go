@@ -145,8 +145,8 @@ func createImage(text string, w, h int, bg colorful.Color, cross bool) *gg.Conte
 		}
 		m.Stroke()
 	}
-	m.SetRGB(red, green, blue)
-	strokeSize := 5
+	m.SetHexColor("#000000")
+	strokeSize := 2
 	for dy := -strokeSize; dy <= strokeSize; dy++ {
 		for dx := -strokeSize; dx <= strokeSize; dx++ {
 			x := float64(w/2 + dx)
@@ -154,11 +154,7 @@ func createImage(text string, w, h int, bg colorful.Color, cross bool) *gg.Conte
 			m.DrawStringAnchored(text, x, y, 0.5, 0.5)
 		}
 	}
-	if red+green+blue > (.5 * 3) {
-		m.SetRGBA(0, 0, 0, .7)
-	} else {
-		m.SetRGBA(1, 1, 1, .7)
-	}
+	m.SetHexColor("#ffffff")
 	m.DrawStringAnchored(text, float64(w)/2, float64(h/2), 0.5, 0.5)
 	m.Fill()
 	return m
