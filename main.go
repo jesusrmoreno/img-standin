@@ -8,10 +8,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/codegangsta/negroni"
-	"github.com/fogleman/gg"
-	"github.com/gorilla/mux"
-	"github.com/lucasb-eyer/go-colorful"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/codegangsta/negroni"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/fogleman/gg"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/gorilla/mux"
+	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/lucasb-eyer/go-colorful"
 )
 
 const maxWidth = 10000
