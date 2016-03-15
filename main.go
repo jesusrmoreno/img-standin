@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/codegangsta/negroni"
 	"github.com/jesusrmoreno/img-standin/Godeps/_workspace/src/github.com/fogleman/gg"
@@ -69,7 +70,6 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	c, err := colorful.Hex(hex)
-
 	if err != nil {
 		sErr := statusError{
 			Code: 400,
@@ -78,6 +78,7 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, sErr.Error(), sErr.Status())
 		return
 	}
+
 	wi, err := strconv.Atoi(width)
 	if err != nil {
 		sErr := statusError{
@@ -105,10 +106,14 @@ func imageHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, sErr.Error(), sErr.Status())
 		return
 	}
-
-	sizeText := width + "x" + height
+	text, ok := vars["text"]
+	if !ok {
+		text = width + "x" + height
+	} else {
+		text = strings.Replace(text, "_", " ", -1)
+	}
 	w.Header().Set("Content-Type", "image/jpeg")
-	if err := createImage(sizeText, wi, he, c).EncodePNG(w); err != nil {
+	if err := createImage(text, wi, he, c).EncodePNG(w); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
@@ -131,18 +136,19 @@ func createImage(text string, width, height int, background colorful.Color) *gg.
 				continue
 			}
 			x := float64(width/2 + dx)
-			y := float64(height - fontSize + dy)
+			y := float64(height/2 + dy)
 			m.DrawStringAnchored(text, x, y, 0.5, 0.5)
 		}
 	}
 	m.SetHexColor("#ffffff")
-	m.DrawStringAnchored(text, float64(width)/2, float64(height)-fontSize, 0.5, 0.5)
+	m.DrawStringAnchored(text, float64(width)/2, float64(height/2), 0.5, 0.5)
 	m.Fill()
 	return m
 }
 
 func main() {
 	r := mux.NewRouter()
+	r.HandleFunc("/{text}/{color}-{width}-{height}.png", imageHandler).Methods("GET")
 	r.HandleFunc("/{color}-{width}-{height}.png", imageHandler).Methods("GET")
 	n := negroni.Classic()
 	n.UseHandler(r)
