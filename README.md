@@ -1,3 +1,4 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/jesusrmoreno/img-standin)](https://goreportcard.com/report/github.com/jesusrmoreno/img-standin)
 # img-standin
 Go app to generate solid color placeholder images. 
 
